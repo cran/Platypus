@@ -41,9 +41,9 @@
 #'#Run VGM with GEX and VDJ integration
 #'VGM <- VDJ_GEX_matrix(VDJ.out.directory.list = VDJ.out.directory.list,
 #'GEX.out.directory.list = GEX.out.directory.list,
-#'GEX.integrate = T, VDJ.combine = T, integrate.GEX.to.VDJ = T
-#', integrate.VDJ.to.GEX = T,
-#'get.VDJ.stats = F, trim.and.align = F)
+#'GEX.integrate = TRUE, VDJ.combine = TRUE, integrate.GEX.to.VDJ = TRUE
+#', integrate.VDJ.to.GEX = TRUE,
+#'get.VDJ.stats = FALSE, trim.and.align = FALSE)
 
 #'#Generate AIRR compatible table supplemented by GEX information
 #'airr.list.out <- PlatypusDB_VGM_to_AIRR(VGM = VGM,

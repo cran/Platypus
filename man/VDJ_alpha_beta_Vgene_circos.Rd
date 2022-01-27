@@ -45,7 +45,8 @@ Returns list of plots. The first n elements contain the circos plot of the n dat
 Produces a Circos plot from the VDJ_analyze output. Connects the V-alpha with the corresponding V-beta gene for each clonotype.
 }
 \examples{
+\dontrun{
  plots <- VDJ_alpha_beta_Vgene_circos(Platypus::small_vgm[[1]]
  , platypus.version="v3")
-
+}
 }

@@ -16,7 +16,7 @@ A list of metadata tables by project. List element names correspond to project i
 Lists metadata tables of available projects on PlatypusDB
 }
 \examples{
-\donttest{
+\dontrun{
 
 #Get list of all available projects and metadata.
 PlatypusDB_projects <- PlatypusDB_list_projects()

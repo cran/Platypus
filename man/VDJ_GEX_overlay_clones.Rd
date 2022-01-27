@@ -14,6 +14,7 @@ VDJ_GEX_overlay_clones(
   ncol.facet,
   pt.size,
   clone.colors,
+  others.color,
   split.plot.and.legend,
   platypus.version
 )
@@ -36,6 +37,8 @@ VDJ_GEX_overlay_clones(
 \item{pt.size}{Numeric. Defaults to 1. Size of points in DimPlot. Passed to Seurat::DimPlot}
 
 \item{clone.colors}{Character vector. Defaults to rainbow(n.clones). Colors to use for individual clones. One can provide either a vector of length n.clones or a of length Nr. of samples/groups \* n.clones. In case that a vector of length n.clones is provided and by.group or by.sample is TRUE, colors are repeated for each sample/group}
+
+\item{others.color}{Character. Color for cells that are not selected i.e. not part of the overlayed clonotypes. Defaults to "grey80". To hide the rest of the umap set to "white"}
 
 \item{split.plot.and.legend}{Boolean. Defaults to FALSE. Whether to return the plot and the legend separately as a list. This can be useful if legends get large and distort the actual plots. The packages gridExtra and cowplot are required for this. If set to TRUE a list is returned where out[[1]] is the plot which can be printed just by executing out[[1]]; out[[2]] is the legend, which can be printed either using plot(out[[2]]) or grid.arrange(out[[2]])}
 

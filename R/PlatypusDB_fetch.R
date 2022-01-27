@@ -1,5 +1,5 @@
 #' Loads and saves RData objects from the PlatypusDB
-#' @param PlatypusDB.links Character vector. One or more links to files in the PlatypusDB. Links are constructed as follows: "\%Project id\%/\%sample_id\%/\%filetype\%". Any of the three can be "ALL", to download all files fitting the other link elements. If \%filetype\% is gexVGM, vdjVGM or metadata, \%sample_id\% needs to be "ALL", as these are elements which are not divided by sample. See examples for clarification. See last example on how to download AIRR compliant data. Feature Barcode (FB) data will be downloaded both for GEX and VDJ if present and does not need to be specified in the path
+#' @param PlatypusDB.links Character vector. One or more links to files in the PlatypusDB. Links are constructed as follows: "\%Project id\%/\%sample_id\%/\%filetype\%". Any of the three can be "ALL", to download all files fitting the other link elements. If \%filetype\% is gexVGM, vdjVGM or metadata, \%sample_id\% needs to be "ALL", as these are elements which are not divided by sample. See examples for clarification. See last example on how to download AIRR compliant data. Feature Barcode (FB) data will be downloaded both for GEX and VDJ if present and does not need to be specified in the path. For sample_id entries the the metadata table for a given project via the function PlatypusDB_list_projects()
 #'@param save.to.disk Boolean. Defaults to FALSE. Whether to save downloaded files individually to the directory specified in path.to.save
 #'@param load.to.enviroment Boolean. Defaults to TRUE. Whether to load objects directly into the current .GlobalEnv. An array of the names of the loaded objects will be returned. !Be aware of RAM limitations of your machine when downloading multiple large files.
 #'@param load.to.list Boolean. Defaults to FALSE. Whether to return loaded objects as a list. !Be aware of RAM limitations of your machine when downloading multiple large files.
@@ -8,7 +8,7 @@
 #' @return A list of loaded project files as R objects if load.to.list = T or a name of these object loaded to the enviroment if load.to.enviroment = T.
 #' @export
 #' @examples
-#' \donttest{
+#' \dontrun{
 #'
 #'#Get a list of available projects by name
 #'names(PlatypusDB_list_projects())
@@ -245,7 +245,7 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
   }
 
 
-  } else if(combine.objects == T){ #IF COMBINING: iterating over download groups
+  } else if(combine.objects == T ){ #IF COMBINING: iterating over download groups
 
     for(j in 1:length(unique(to_download$group))){
       curr_to_download <- subset(to_download, group == unique(to_download$group)[j])
@@ -325,12 +325,44 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
           rm(list = ls(pattern = curr_download_name, envir = .GlobalEnv), envir = .GlobalEnv)
         }
         #end of else if(nrow(curr_to_download) == 1)
-      } else if(nrow(curr_to_download) > 2){
-        print("Downloads of different samples are not combined. Please set load.to.list = T to return a single list containing info of all downloaded samples which can be used as input to the VDJ_GEX_matrix function")
+      } else if(nrow(curr_to_download) > 2){ #looks like wrong grouping or no grouping
+        message("Downloads of different samples are not combined. Please set load.to.list = T to return a single list containing info of all downloaded samples which can be used as input to the VDJ_GEX_matrix function")
+
+        for(k in 1:nrow(to_download)){
+          tryCatch({
+
+            curr_download_name <- gsub("\\.RData","",to_download$name[k]) #have a name ready to use for objects in the r enviroment without the .RData extension
+
+            message(paste0(Sys.time(), ": Starting download of ", to_download$name[k],"..."))
+
+            if(save.to.disk == T){ #if objects are to be saved to disk, this happens here.
+              utils::download.file(to_download$url[k], destfile = paste0(path.to.save,curr_download_name, ".RData")) #Saving directly to disk to avoid RAM usage
+
+            } else { #Save to disk == F
+
+              load(url(to_download$url[k]), envir = .GlobalEnv) #download and load to global enviroment
+
+              if(load.to.list == T){
+                out.list[[k]] <- get(curr_download_name) #if a list of objects is to be returned, add the just loaded object into a list
+                names(out.list)[k] <- curr_download_name
+              } else {
+                out.list[[k]] <- curr_download_name #if not list of objects is to be returned, only the name of the loaded object is appended and will be returned for reference. (see also last few lines of the function)
+              }
+
+              if(load.to.enviroment == F){ #if objects should not present in the global enviroment at the end of the function run, we delete them from the .GlobalEnv again.
+                rm(list = ls(pattern = curr_download_name, envir = .GlobalEnv), envir = .GlobalEnv)
+              }
+            }
+
+          }, error=function(e){
+            message(paste0("Failed to load",  to_download$url[i], "\n", e))})
+
+
+        }
       }
       }, error=function(e){
-        print(e)
-        print(paste0("Failed to load",  names(out.list)[j]))})
+        message(e)
+        message(paste0("Failed to load",  names(out.list)[j]))})
     } #end of loop over files
   } #end of if(combine.object == T)
 
