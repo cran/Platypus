@@ -149,7 +149,7 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
   to_download_list <- list()
   for(i in 1:nrow(link_parts)){
     #look for patterns were objects could be combined
-    if(stringr::str_detect(link_parts[i,4], "s\\d+/ALL.RData")){
+    if(link_parts[i,2] != "" & link_parts[i,3] == "ALL.RData"){
       to_download <- subset(platypusdb_lookup, project_id == link_parts[i,1] & sample_id == link_parts[i,2])
       if(nrow(to_download) == 2){
       to_download$group <- gcount
@@ -159,11 +159,19 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
       to_download_list[[i]] <- to_download
       }
 
-    } else if(stringr::str_detect(link_parts[i,4], "ALL/ALL.RData")){
+    }
+      if(stringr::str_detect(link_parts[i,4], "ALL/ALL.RData")){
       to_download <- subset(platypusdb_lookup, project_id == link_parts[i,1] & sample_id != "")
+
+      #order based on sample id. This is flexible as long as sample numbers are contained such e.g. s1 or S1 and these are separated from the rest of the sample id by .
+      sample_split <- stringr::str_split(toupper(to_download$sample_id), "\\.", simplify = T)
+      sample_order <- sample_split[,stringr::str_detect(sample_split[1,],"S\\d+")]
+      sample_order <- as.numeric(gsub("S","",sample_order))
+      to_download <- to_download[order(sample_order),]
 
       for(j in 1:length(unique(to_download$sample_id))){
         to_download_s <- subset(to_download, sample_id == unique(to_download$sample_id)[j])
+
 
         if(all(c("VDJ.RData", "GEX.RData") %in% to_download_s$filetype) & nrow(to_download_s == 2)){
         to_download_s$group <- gcount
@@ -174,7 +182,8 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
         }
       }
 
-    } else if(stringr::str_detect(link_parts[i,4], "//ALL.RData")){
+    }
+    if(stringr::str_detect(link_parts[i,4], "//ALL.RData")){
       to_download <- subset(platypusdb_lookup, project_id == link_parts[i,1] & filetype %in% c("VDJmatrix.RData", "GEXmatrix.RData"))
       if(nrow(to_download) == 2){
 
@@ -185,7 +194,9 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
       } else {
         stop("More than 2 matrix files detected for this project #174")
       }
-    } else {
+    }
+
+    if(length(to_download_list) < i) {
     #subset hierarchically
     if(link_parts[i,1] == "ALL"){
       to_download <- platypusdb_lookup
@@ -200,6 +211,16 @@ PlatypusDB_fetch <- function(PlatypusDB.links,
       to_download <- subset(to_download, filetype == link_parts[i,3])
       to_download$group <- gcount
       gcount <- gcount + 1
+    }
+
+      #order based on sample id. This is flexible as long as sample numbers are contained such e.g. s1 or S1 and these are separated from the rest of the sample id by .
+    if(any(to_download$sample_id != "")){
+      print(to_download)
+      sample_split <- stringr::str_split(toupper(to_download$sample_id), "\\.", simplify = T)
+      sample_order <- sample_split[,stringr::str_detect(sample_split[1,],"S\\d+")]
+      sample_order <- as.numeric(gsub("S","",sample_order))
+      to_download <- to_download[order(sample_order),]
+      print(to_download)
     }
       to_download_list[[i]] <- to_download
     }

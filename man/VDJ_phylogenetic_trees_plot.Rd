@@ -2,7 +2,7 @@
 % Please edit documentation in R/VDJ_phylogenetic_trees_plot.R
 \name{VDJ_phylogenetic_trees_plot}
 \alias{VDJ_phylogenetic_trees_plot}
-\title{Function to plot phylogenetic trees obtained from VDJ_phylogenetic_trees}
+\title{Phylogenetic tree plotting}
 \usage{
 VDJ_phylogenetic_trees_plot(
   tree.dfs,
@@ -27,6 +27,8 @@ VDJ_phylogenetic_trees_plot(
 nested list of ggtree plot objects for each sample and each clonotype.
 }
 \description{
+Function to plot phylogenetic trees obtained from VDJ_phylogenetic_trees
+
 !Requires the ggtree package to be loaded! Plots trees from function VDJ_phylogenetic_trees
 }
 \examples{

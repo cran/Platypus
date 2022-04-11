@@ -1,4 +1,6 @@
-#' Yields overlap heatmap and datatable of features or combined features for different samples or groups
+#'Wrapper to determine and plot overlap between VDJ features across groups
+#'
+#' @description Yields overlap heatmap and datatable of features or combined features for different samples or groups
 #' @param VDJ VDJ output of the VDJ_GEX_matrix function (VDJ_GEX_matrix.output[[1]])
 #' @param feature.columns A character array of column names of which the overlap should be displayed. The content of these columns is pasted together (separated by "/"). E.g. if the overlap in cells germline gene usage is desired, the input could be c("VDJ_jgene","VDJ_dgene","VDJ_vgene"). These columns would be pasted and compared across the grouping variable.
 #' @param grouping.column A column which acts as a grouping variable. If repertoires are to be compared use the sample_id column.
@@ -180,8 +182,8 @@ VDJ_overlap_heatmap <- function(VDJ,
     allcombs <- c(unlist(as.character(combs[,1])), unlist(as.character(combs[,2]))) #get the unique values from the combinations table
     allcombs <- ordered(as.factor(allcombs), levels = (sample.names)) #order those
     pheat_map <- matrix(data = NA, nrow = length(unique(allcombs)), ncol = length(unique(allcombs))) #make a symmetric matrix template
-    colnames(pheat_map) <- unique(allcombs[order(allcombs)]) #rename
-    rownames(pheat_map) <- unique(allcombs[order(allcombs)])
+    colnames(pheat_map) <- unique(allcombs[order(rev(allcombs))]) #rename
+    rownames(pheat_map) <- unique(allcombs[order(rev(allcombs))])
     for(i in 1:nrow(combs)){ #assign the corresponding values twice (once for upper triangle and once for lower)
       #upper triangle
       pheat_map[which(colnames(pheat_map) == combs[i,1]), which(rownames(pheat_map) == combs[i,2])] <- round(as.numeric(combs[i,5]),3)
@@ -189,9 +191,9 @@ VDJ_overlap_heatmap <- function(VDJ,
       pheat_map[which(colnames(pheat_map) == combs[i,2]), which(rownames(pheat_map) == combs[i,1])] <- round(as.numeric(combs[i,5]),3)
     }
     if(jaccard){
-    plot_out <- pheatmap::pheatmap(pheat_map,main = paste0("Overlap features: " ,paste0(feature.columns, collapse = " ; ")), border_color = "white", scale = "none", cluster_rows = F, cluster_cols = F,display_numbers = T, number_format = "%.3f", angle_col = 315)
+    plot_out <- pheatmap::pheatmap(pheat_map,main = paste0("Overlap features: " ,paste0(feature.columns, collapse = " ; ")), border_color = "white", scale = "none", cluster_rows = F, cluster_cols = F,display_numbers = T, number_format = "%.3f", angle_col = 315, fontsize_number  = pvalues.label.size, fontsize_row = axis.label.size, fontsize_col = axis.label.size)
     } else {
-      plot_out <- pheatmap::pheatmap(pheat_map,main = paste0("Overlap features: " ,paste0(feature.columns, collapse = " ; ")), border_color = "white", scale = "none", cluster_rows = F, cluster_cols = F,display_numbers = T, number_format = "%.0f", angle_col = 315)
+      plot_out <- pheatmap::pheatmap(pheat_map,main = paste0("Overlap features: " ,paste0(feature.columns, collapse = " ; ")), border_color = "white", scale = "none", cluster_rows = F, cluster_cols = F,display_numbers = T, number_format = "%.0f", angle_col = 315, fontsize_number  = pvalues.label.size, fontsize_row = axis.label.size, fontsize_col = axis.label.size)
     }
     combs <- pheat_map
   }

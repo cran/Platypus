@@ -1,7 +1,10 @@
-#' Updated clonotyping function based on implications for cells with different chain numbers than 1 VDJ 1 VJ chains.
+#' Platypus V3 clonotyping wrapper
+#'
+#'@description Updated clonotyping function based on implications for cells with different chain numbers than 1 VDJ 1 VJ chains.
 #'@description This function offers two types of hierarchical clonotyping. The hierarchical option "single.chains" only merges cell with a single chain into clonotypes composed of cells with 1 VDJ 1 VJ chain. This is based on the assumption, that during mRNA capture and RT-PCR in GEMs, not all transcripts are captured and therefore cells may result missing a VDJ or VJ chain.
 #' The hierarchical option "double.and.single.chains" is based on the assumption, that cells with 1 VDJ and 2 VJ chains exist. For a review of the work concerning such cells as well as 2 VDJ 1 VJ cells please consult: https://doi.org/10.4049/jimmunol.1800904. The user may set a threshold of occurrence number above which cells with 1 VDJ 2 VJ chains are considered to be true and other cells with 1 VDJ 1 VJ, 1 VDJ 0 VJ and 0 VDJ 1 VDJ may be merged into the same clonotype by the strategy provided by the user. Cells with 2 VDJ chains are currently not considered in this process, as these are reported to be much rarer and, if appearing in the dataset are more likely to be doublets.
 #' We advice the user to carefully examine the output after hierarchical clonotyping before proceeding with further analysis.
+#' We thank Prof. Vijayanand as well as Vicente and Emmanuel from his lab for the discussions that have helped with improving the original Platypus clonotyping strategy.
 #' @param VDJ For platypus v2 output from VDJ_analyze function. This should be a list of clonotype dataframes, with each list element corresponding to a single VDJ repertoire. For platypus v3 VDJ output from the VDJ_GEX_matrix function (VDJ_GEX_matrix.output[[1]])
 #' @param clone.strategy (Updated keywords, previous format is also functional) String describing the clonotyping strategy. Possible options are 10x.default, cdr3.nt, cdr3.aa, VDJJ.VJJ, VDJJ.VJJ.cdr3length, VDJJ.VJJ.cdr3length.cdr3.homology, VDJJ.VJJ.cdr3length.VDJcdr3.homology, cdr3.homology, VDJcdr3.homology. cdr3.aa will convert the default cell ranger clonotyping to amino acid based. 'VDJJ.VJJ' groups B cells with identical germline genes (V and J segments for both heavy chain and light chain. Those arguments including 'cdr3length' will group all sequences with identical VDJ and VJ CDR3 sequence lengths. Those arguments including 'cdr3.homology' will additionally impose a homology requirement for CDRH3 and CDRL3 sequences.'CDR3.homology',or 'CDRH3.homology' will group sequences based on homology only (either of the whole CDR3 sequence or of the VDJ CDR3 sequence respectively).
 #' All homology calculations are performed on the amino acid level.
@@ -17,7 +20,7 @@
 #' @param VDJ.VJ.1chain Logical specifying whether cells other than once with 1 VDJ and 1 VJ chains should be considered.
 #' @param output.format Parameter output.format is deprecated. If non VGM-style output is required please refer to the function VDJ_clonotype. Output is VGM style VDJ by cell dataframe
 #' @param platypus.version Only "v3" available
-#' @return Returns a VGM[[1]]-type dataframe. All columns of the input VDJ dataframe are maintained and extra columns are added with clonotyping information.New columns are named by clonotyping strategy so to allow for multiple clonotyping identifiers to be present in the same VDJ dataframe and make comparisons between these straighforward.
+#' @return Returns a VGM[[1]]-type dataframe. The columns clonotype_id and clonotype_frequency are updated with the new clonotyping strategy. They represent the "active strategy" that downstream functions will use. Furthermore extra columns are added with clonotyping information.New columns are named by clonotyping strategy so to allow for multiple clonotyping identifiers to be present in the same VDJ dataframe and make comparisons between these straighforward.
 #' @export
 #' @examples
 #' reclonotyped_vgm <- VDJ_clonotype_v3(VDJ=Platypus::small_vgm[[1]],
@@ -582,6 +585,21 @@ VDJ_clonotype_v3 <- function(VDJ,
   #cleanup
   VDJ.GEX.matrix <- VDJ.GEX.matrix[,-c(which(names(VDJ.GEX.matrix) %in% c("nchar_VDJ_cdr3s_aa", "nchar_VJ_cdr3s_aa","unique_id_internal")))]
   VDJ.GEX.matrix <- VDJ.GEX.matrix[,c(2:ncol(VDJ.GEX.matrix), 1)]
+
+  #Updating the active clonotype!
+
+  #First, make sure to back up existing 10x clonotyping strategy
+  if(!"clonotype_frequency_10x" %in% names(VDJ.GEX.matrix)){
+    message("Backing up 10x default clonotyping in columns clonotype_id_10x and clonotype_frequency_10x before updating clonotype_id and clonotype_frequency columns")
+
+    VDJ.GEX.matrix$clonotype_frequency_10x <- VDJ.GEX.matrix$clonotype_frequency
+    #Move clonotype_id_10x to the last column spot
+    VDJ.GEX.matrix <- VDJ.GEX.matrix[c(names(VDJ.GEX.matrix)[names(VDJ.GEX.matrix) != "clonotype_id_10x"], "clonotype_id_10x")]
+  }
+
+  VDJ.GEX.matrix$clonotype_id <- VDJ.GEX.matrix$new_clonotype_id
+  VDJ.GEX.matrix$clonotype_frequency <- VDJ.GEX.matrix$new_clonal_frequency
+
 
   if(!global.clonotype){
     if(any(stringr::str_detect(names(VDJ.GEX.matrix), paste0("clonotype_id_",clone.strategy.as.input)))){

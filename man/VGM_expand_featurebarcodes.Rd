@@ -2,7 +2,7 @@
 % Please edit documentation in R/VGM_expand_featurebarcodes.R
 \name{VGM_expand_featurebarcodes}
 \alias{VGM_expand_featurebarcodes}
-\title{Replaces the original sample_id column of a vgm object with a pasted version of the original sample_id and the last digits of the feature barcode.}
+\title{Utility for feature barcode assignment including clonal information}
 \usage{
 VGM_expand_featurebarcodes(
   vgm,
@@ -28,7 +28,7 @@ This function returns a vgm with new sample_id's in case vdj.only is set to FALS
 Note: If vdj.only is set to default (FALSE), VDJ information in the metadata of the GEX object is necessary. For this set integrate.VDJ.to.GEX to TRUE in the VDJ_GEX_matrix function
 }
 \description{
-The VGM_expand_featurebarcodes function function can be used to trace back the cell origin of each sample after using cell hashing for single-cell sequencing.
+The VGM_expand_featurebarcodes function function can be used to trace back the cell origin of each sample after using cell hashing for single-cell sequencing. Replaces the original sample_id column of a vgm object with a pasted version of the original sample_id and the last digits of the feature barcode.
 
 The original sample_id is stored in a new column called original_sample_id. Additionally, a second new column is created containing final barcode assignment information.
 Those barcodes match the origin FB_assignment if by.majority.barcodes is set to FALSE (default). However, if this input parameter is set to TRUE, the majority barcode assignment in stored in this colum.

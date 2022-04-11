@@ -3,7 +3,9 @@
 
 ![](https://repository-images.githubusercontent.com/297313954/10e0a180-713e-11eb-9a23-ef93a9d86e8b)
 
-# Platypus 
+## [==&gt; Platypus and PlatypusDB homepage](https://alexyermanos.github.io/Platypus/index.html "Platypus and PlatypusDB homepage")
+
+# Platypus
 
 Platypus is an R toolkit designed to facilitate the data analysis of
 single-cell immune repertoire sequencing experiments. The manuscript
@@ -13,27 +15,27 @@ corresponding to Platypus v2 can be found here at Yermanos et al NARGAB
 # Ongoing updates in the Platypus pipeline (v3)
 
 Due to the recent changes of the default clonotyping strategy in
-Cellranger (version 5 and version 6) we have built v3 of
-Platypus to revolve around the VDJ\_GEX\_matrix function. This function
-integrates both repertoire and transcriptome information and will serve
-as the input to all secondary functions in future iterations of the
-package. The advantage of this is having all repertoire and
-transcriptome information at a per-cell level.
+Cellranger (version 5 and version 6) we have rebuild of Platypus to
+revolve around the VDJ\_GEX\_matrix function. This function integrates
+both repertoire and transcriptome information and will serve as the
+input to all secondary functions in future iterations of the package.
+The advantage of this is having all repertoire and transcriptome
+information at a per-cell level.
 
-# PlatypusDB
-
-Together with the update to Platypus v3, we also introduce PlatypusDB, a database for , a database with an integrated R component that allows 
-the rapid analysis and integration of hundreds of thousands of B and T cells containing both adaptive immune receptor information (VDJ) and single-cell transcriptomes (GEX). 
-PlatypusDB both stores raw output files from the commonly used aligner tool cellranger (10x genomics) and also holds the immune-relevant data in the form of an Robject
-that can be loaded directly into the R environment without explicitly requiring file download. The user has the ability to
-i) download entire experiments from given publications, ii) download individual samples in PlatypusDB, and iii) download and integrate samples on PlatypusDB with their own local samples.
-All functions needed are contained within Platypus v3. 
+Furthermore we developed PlatypusDB, a publicly available database that
+facilitates the download, integration, and analysis of hundred thousands
+of single-cells that contain GEX information, VDJ information or both.
+With a single line of code, PlatypusDB allows users to either download
+and explore available datasets or integrate existing experiments with
+their own datasets. Collectively, PlatypusDB serves as a database for
+the scientific community interested in exploration of single cell immune
+repertoire sequencing experiments from mouse and human.
 
 Stay tuned for updates <https://twitter.com/AlexYermanos>
 
 ## Architecture
 
-![](https://raw.githubusercontent.com/alexyermanos/Platypus/master/docs/images/PlatypusV3_abstract.png)
+![](images/PlatypusV3_abstract.png)
 
 # System requirements
 
@@ -47,7 +49,7 @@ GitHub. Please see the vignette for examples of how the package can be
 used.
 
 Please scroll down for instructions on how to install the necessary
-packages.
+dependencies.
 
 ``` r
 ### Removing any previous versions of the package
@@ -57,32 +59,25 @@ packages.
 
 ### Downloading and installing Platypus
 
+#install.packages("Platypus")
 
-# First we need to download the most recent version from the master branch at https://github.com/alexyermanos/Platypus we can install the package using the following command. 
-# WARNING: This needs to be replaced with your own directory where the downloaded package is found
-
-# For MacOS ( users it may look like this
-#install.packages("~/Downloads/Platypus_2.0.4.tar.gz", repos = NULL, type="source")
-
-# For windows it will likely look something like this. 
-# WARNING: You will need to replace YourPCName with your User name for the windows account in the directory. 
-# install.packages("C:\Users\YourPCName\Downloads\Platypus_2.0.4.tar.gz", repos = NULL, type="source")
-
-# Now we can load the installed package into the R environment. 
-#library(Platypus)
-
-# The individual R functions can additionally be found on the github in the Functions branch. Within this branch, there is a folder "R" which contains the individual functions. This can similarly be downloaded and loaded into the R environment incase not all functions are desired. Similarly, these functions are actively updated and may include more features than the in original tar.gz file. 
+# The individual R functions can additionally be found on the github in the Functions branch. Within this branch, there is a folder "R" which contains the individual functions. This can similarly be downloaded and loaded into the R environment incase not all functions are desired. Similarly, these functions are actively updated and may include more features than the in current CRAN version. 
 ```
 
 Platypus uses a number of different R packages, some of which need prior
-installation. These can be installed either from CRAN, Bioconductor
-using “BiocManager” or GitHub using “devtools”:
+installation. These can be installed either from CRAN, Bioconductor:
 
 ## CRAN
 
 Code to install the packages from CRAN:
 
 ``` r
+#Essential packages
+install.packages("tidyverse")
+install.packages("Seurat")
+install.packages("utils")
+
+#Optional packages needed for some individual functions
 install.packages("ape")
 install.packages("circlize")
 install.packages("do")
@@ -94,14 +89,7 @@ install.packages("jsonlite")
 install.packages("phytools")
 install.packages("reshape2")
 install.packages("seqinr")
-install.packages("Seurat")
-install.packages("scales")
 install.packages("stringdist")
-install.packages("stringr")
-install.packages("tibble")
-install.packages("tidyverse")
-install.packages("useful")
-#install.packages("utils")
 ```
 
 ## GitHub
@@ -129,5 +117,6 @@ BiocManager::install("fgsea")
 BiocManager::install("msa")
 ```
 
-Please post on the github page with any questions or if you would like
-to contribute.
+Please post any questions or issues in the respecitve github section:
+<https://github.com/alexyermanos/Platypus/issues> Please reach out to us
+with any questions or if you would like to contribute.

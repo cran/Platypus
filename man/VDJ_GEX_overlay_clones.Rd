@@ -2,7 +2,7 @@
 % Please edit documentation in R/VDJ_GEX_overlay_clones.R
 \name{VDJ_GEX_overlay_clones}
 \alias{VDJ_GEX_overlay_clones}
-\title{Highlights the cells belonging to any number of top clonotypes or of specifically selected clonotypes from one or more samples or groups in a GEX dimensional reduction.}
+\title{Overlay clones on GEX projection}
 \usage{
 VDJ_GEX_overlay_clones(
   GEX,
@@ -20,7 +20,7 @@ VDJ_GEX_overlay_clones(
 )
 }
 \arguments{
-\item{GEX}{A single seurat object from VDJ_GEX_matrix, which also includes VDJ information in the metadata (set integrate.VDJ.to.GEX to TRUE in the VDJ_GEX_matrix function) (VDJ_GEX_matrix.output[[2]])}
+\item{GEX}{A single seurat object from VDJ_GEX_matrix, which also includes VDJ information in the metadata (set integrate.VDJ.to.GEX to TRUE in the VDJ_GEX_matrix function) (VDJ_GEX_matrix.output[[2]]) ! Clone ids and frequencies are drawn from the columns "clonotype_id" and "clonotype_frequency"}
 
 \item{reduction}{Character. Defaults to "umap". Name of the reduction to overlay clones on. Can be "pca", "umap", "tsne"}
 

@@ -2,7 +2,7 @@
 % Please edit documentation in R/VDJ_assemble_for_PnP.R
 \name{VDJ_assemble_for_PnP}
 \alias{VDJ_assemble_for_PnP}
-\title{Assembles sequences from MIXCR output into inserts for expression in PnP cells. For detailes check https://doi.org/10.1038/ncomms12535 ! ALWAYS VALIDATE INDIVIDUAL SEQUENCE IN GENEIOUS OR OTHER SOFTWARE BEFORE ORDERING SEQUENCES FOR EXPRESSION ! Check notes on column content below ! Only cells with 1 VDJ and 1 VJ sequence are considered. Warnings are issued if sequences do not pass necessary checks}
+\title{Ab sequence assembly for recombinant PnP expression}
 \usage{
 VDJ_assemble_for_PnP(
   VDJ.mixcr.matrix,

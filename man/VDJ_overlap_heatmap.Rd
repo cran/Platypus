@@ -2,7 +2,7 @@
 % Please edit documentation in R/VDJ_overlap_heatmap.R
 \name{VDJ_overlap_heatmap}
 \alias{VDJ_overlap_heatmap}
-\title{Yields overlap heatmap and datatable of features or combined features for different samples or groups}
+\title{Wrapper to determine and plot overlap between VDJ features across groups}
 \usage{
 VDJ_overlap_heatmap(
   VDJ,

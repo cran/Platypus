@@ -1,4 +1,6 @@
-#' Utility function for loading in local dataset as VDJ_GEX_matrix and PlatypusDB compatible R objects. Especially useful when wanting to integrate local and public datasets. This function only imports and does not make changes to format, row and column names. Exception: filtered_contig.fasta are appended to the filtered_contig_annotations.csv as a column for easy access
+#'PlatypusDB utility for import of local datasets
+#'
+#'@description Utility function for loading in local dataset as VDJ_GEX_matrix and PlatypusDB compatible R objects. Especially useful when wanting to integrate local and public datasets. This function only imports and does not make changes to format, row and column names. Exception: filtered_contig.fasta are appended to the filtered_contig_annotations.csv as a column for easy access
 #' @param VDJ.out.directory.list List containing paths to VDJ output directories from cell ranger. This pipeline assumes that the output file names have not been changed from the default 10x settings in the /outs/ folder. This is compatible with B and T cell repertoires (both separately and simultaneously).
 #'@param GEX.out.directory.list List containing paths the outs/ directory of each sample or directly the raw or filtered_feature_bc_matrix folder. Order of list items must be the same as for VDJ. This outs directory may also contain Feature Barcode (FB) information. Do not specify FB.out.directory in this case.
 #'@param FB.out.directory.list List of paths pointing at the outs/ directory of output of the Cellranger counts function which contain Feature barcode counts. Any input will overwrite potential FB data loaded from the GEX input directories. Length must match VDJ and GEX directory inputs. (in case of a single FB output directory for multiple samples, please specifiy this directory as many times as needed)
@@ -158,7 +160,7 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
     clonotype.list <- as.list(rep("none",length(GEX.out.directory.list)))
     reference.list <- as.list(rep("none",length(GEX.out.directory.list)))
     annotations.table <- as.list(rep("none",length(GEX.out.directory.list)))
-    contigs.table <- as.list(rep("none",length(GEX.out.directory.list)))
+    contig.table <- as.list(rep("none",length(GEX.out.directory.list)))
     VDJ.out.directory.list <- as.list(rep("none",length(GEX.out.directory.list)))
     metrics.table <- as.list(rep("none",length(GEX.out.directory.list)))
     airr.table <- as.list(rep("none",length(GEX.out.directory.list)))
@@ -195,7 +197,7 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
       FB.loaded <- F
       #dealing with possible mixed GEX FB inputs or multiple FB input matrices from the same directory
       for(i in 1:length(GEX.list)){ #iterating over main list
-        if(class(GEX.list[[i]]) == "list"){ #this returns true only if the GEX directory import contained more than one marices => i.e. there is a GEX and a FB matrix
+        if(inherits(GEX.list[[i]],"list")){ #this returns true only if the GEX directory import contained more than one marices => i.e. there is a GEX and a FB matrix
           GEX_ind <- c() #open indices for GEX and FB list elements
           FB_ind <- c()
           for(j in 1:length(GEX.list[[i]])){ #Now iterating over the elements of this particular FB directory input
@@ -283,7 +285,7 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
 
       #dealing with possible mixed GEX FB inputs or multiple FB input matrices from the same directory
       for(i in 1:length(FB.list)){ #iterating over main list
-        if(class(FB.list[[i]]) == "list"){ #this returns true only if the FB directory import contained more than one marices
+        if(inherits(FB.list[[i]],"list")){ #this returns true only if the FB directory import contained more than one marices
           to_del <- c()
           for(j in 1:length(FB.list[[i]])){ #Now iterating over the elements of this particular FB directory input
             if(nrow(FB.list[[i]][[j]]) > 100){ #Checking whether this matrix may contain cite seq or feature barcodes. If the number of features is over 100, the matrix almost certainly contains GEX information. We will discard this matrix
