@@ -94,7 +94,10 @@ GEX_volcano <- function(DEGs.input,
   if(n.label.up == F & n.label.down == F){
   }
 
-  if(!inherits(n.label.up, "numeric") | !inherits(n.label.down, "numeric")){
+  class_up <- as.character(class(n.label.up))
+  class_down <- as.character(class(n.label.down))
+
+  if(class_down != class_up){
     temp <- list(n.label.up, n.label.down)
     n.genes <- as.numeric(Filter(is.numeric, temp))
     n.label.up <- n.genes
@@ -192,8 +195,22 @@ GEX_volcano <- function(DEGs.input,
   }
 
   if(cluster.genes.output == T){
+
     output.plot <- list()
-    for (i in 1:1) {
+
+    if(is.list(DEGs.input)){
+      DEGs.input.length <- length(DEGs.input)
+    }else{
+      DEGs.input.length <- 1
+    }
+
+    for (i in 1:DEGs.input.length) {
+
+      if(is.list(DEGs.input)){
+        findmarkers.output <- DEGs.input[[i]]
+      }else{
+        findmarkers.output <- DEGs.input
+      }
 
       if(RP.MT.filter ==T){
         exclude <- c()

@@ -1,0 +1,4 @@
+	all_sum
+group_1_3	18
+group_2_6	1
+group_3_9	12

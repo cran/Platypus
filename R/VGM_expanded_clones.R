@@ -39,7 +39,7 @@ VGM_expanded_clones <- function(VGM,
     freq_cols <- which(stringr::str_detect(names(VGM[[1]]), "clonotype_frequency"))
     new_cols <- c()
     for(i in freq_cols){
-      if(inherits(VGM[[1]][,i],"numeric") | inherits(VGM[[1]][,i],"integer")){
+      if(class(VGM[[1]][,i]) %in% c("numeric", "integer")){
         VGM[[1]][,paste0("expanded_", names(VGM[[1]])[i])] <- VGM[[1]][,i] > expansion.threshold
         new_cols <- c(new_cols, paste0("expanded_", names(VGM[[1]])[i]))
       } else {
@@ -59,7 +59,7 @@ VGM_expanded_clones <- function(VGM,
     freq_cols <- which(stringr::str_detect(names(VGM[[2]]@meta.data), "clonotype_frequency"))
     new_cols <- c()
     for(i in freq_cols){
-      if(inherits(VGM[[2]]@meta.data[,i], "numeric") | inherits(VGM[[2]]@meta.data[,i], "integer")){
+      if(class(VGM[[2]]@meta.data[,i])  %in% c("numeric", "integer")){
         VGM[[2]]@meta.data[,paste0("expanded_", names(VGM[[2]]@meta.data)[i])] <- VGM[[2]]@meta.data[,i] > expansion.threshold
         new_cols <- c(new_cols, paste0("expanded_", names(VGM[[2]]@meta.data)[i]))
       } else {

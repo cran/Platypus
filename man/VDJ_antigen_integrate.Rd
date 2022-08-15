@@ -13,6 +13,7 @@ VDJ_antigen_integrate(
   match.by,
   matching.type,
   distance.threshold,
+  cores,
   sample.id,
   aberrant.chosen.sequences,
   output.format
@@ -36,6 +37,8 @@ For example, if binder.threshold=list(list('affinity', 0.2), list('elisa', 0.8))
 
 \item{distance.threshold}{integer, maximum string distance value by which to match sequences in the antigen data and sequences in the VDJ object (to further integrate the antigen data).}
 
+\item{cores}{Number of cores to use for parallel computations. Defaults to number of available cores. Setting this parameter is good practice on clusters.}
+
 \item{sample.id}{boolean, if T then will also match by the 'sample_id' column in the antigen dataframes.}
 
 \item{aberrant.chosen.sequences}{boolean, if T will add a column of the chosen aberrant sequences (which matched a sequence in the antigen data) if matching by sequence (and VDJ.VJ.1chain=F).}
@@ -50,7 +53,7 @@ Integrate antigen-specific information from a list of antigen dataframes or anti
 }
 \examples{
 \dontrun{
-VDJ_antigen_integrate_v2(VDJ,antigen.directory.list=antigen.directory.list,
+VDJ_antigen_integrate(VDJ,antigen.directory.list=antigen.directory.list,
 antigen.feature=c('elisa', 'affinity'),VDJ.VJ.1chain=T,
 match.by='clonotype',sample.id=T, output.format='vgm')
 }

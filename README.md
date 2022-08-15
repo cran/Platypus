@@ -44,24 +44,33 @@ Windows 10 Pro (v1909), and used on R versions 4.0.0 and 3.6.1
 
 # Installation
 
-The package can be installed directly from the tar.gz file on this
-GitHub. Please see the vignette for examples of how the package can be
-used.
+Platypus can easily be installed from CRAN or Github. As changes and bugfixes are made regularly, the Github version may be more recent.
 
-Please scroll down for instructions on how to install the necessary
-dependencies.
+Please scroll down for instructions on how to install the necessary dependencies. 
 
 ``` r
+
 ### Removing any previous versions of the package
 # First we will ensure that there is no previous version installed locally
 #detach("package:Platypus", unload=TRUE)
 #remove.packages("Platypus")
 
-### Downloading and installing Platypus
+### Downloading and installing Platypus from Github
 
-#install.packages("Platypus")
+# First we need to download the most recent version from the master branch at https://github.com/alexyermanos/Platypus we can install the package using the following command. 
+# WARNING: This needs to be replaced with your own directory where the downloaded package is found
+# For MacOS users it may look like this
+install.packages("~/Downloads/Platypus_3.4.1.tar.gz", repos = NULL, type="source")
+# For windows it will likely look something like this. 
+# WARNING: You will need to replace 'YourPCName' with your user name for the windows account in the directory. 
+install.packages("C:/Users/YourPCName/Downloads/Platypus_3.4.1.tar.gz", repos = NULL, type="source")
+
+### Downloading and installing Platypus from CRAN
+
+install.packages("Platypus")
 
 # The individual R functions can additionally be found on the github in the Functions branch. Within this branch, there is a folder "R" which contains the individual functions. This can similarly be downloaded and loaded into the R environment incase not all functions are desired. Similarly, these functions are actively updated and may include more features than the in current CRAN version. 
+
 ```
 
 Platypus uses a number of different R packages, some of which need prior

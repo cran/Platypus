@@ -248,7 +248,7 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
   #! Not checking if FB have already been loaded as part of GEX. If FB directory is supplied, any FB data loaded by GEX is therefore overwritten. This should allow for more flexibility of the user without having to realign the whole GEX data
   if(FB.out.directory.list[[1]] != "none"){
 
-    gex_load_error <- tryCatch({suppressWarnings({
+    gex_load_error <- tryCatch({
 
       #add the directory identifier
       if(stringr::str_detect(FB.out.directory.list[[1]], "filtered_feature_bc_matrix")){
@@ -259,8 +259,8 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
         FB.out.directory.list.p <- FB.out.directory.list
         message("Loading feature barcodes from raw_feature_bc_matrix folder \n")
       } else{
-        FB.out.directory.list.p <- paste(FB.out.directory.list,"/raw_feature_bc_matrix",sep="")
-        message("Loading feature barcodes from raw_feature_bc_matrix folder \n")
+        FB.out.directory.list.p <- FB.out.directory.list
+        message("Loading feature barcodes from input path \n")
       }
       #Actually loading the data. Critical: if Cellranger 6.1.0 count was run with --libraries input containing both GEX and Feature Barcodes, reading it will result in a list of matrices instead of a single matrix. => the next section deals with this
       n_not_loaded <- 0
@@ -281,7 +281,22 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
         }
       }
 
+      if(all(FB.list == "none")){
+        warning("None of FB data could be loaded. Retrying with gene.column = 1")
+        FB.list <- lapply(FB.out.directory.list.p, function(x) tryCatch({Seurat::Read10X(data.dir=x, gene.column = 1)},
+                                                                        error = function(e){
+                                                                          n_not_loaded <- n_not_loaded + 1
+                                                                          return(NULL)}))
 
+      }
+      #Replacing null values with "none" which will be picked up by the VGM function
+      for(i in 1:length(FB.list)){
+        if(is.null(FB.list[[i]])){
+          FB.list[[i]] <- "none"
+        }
+      }
+      if(all(FB.list == "none")){
+        warning("Loading FB data failed")}
 
       #dealing with possible mixed GEX FB inputs or multiple FB input matrices from the same directory
       for(i in 1:length(FB.list)){ #iterating over main list
@@ -306,7 +321,7 @@ PlatypusDB_load_from_disk <- function(VDJ.out.directory.list,
       #Done => result should be a non-nested list of matrices only containing FB information. With this we can move forward
 
       FB.loaded <- T
-    })}, error = function(e){
+   }, error = function(e){
       message(paste0("Loading FB failed \n", e))})
 
   } else {
