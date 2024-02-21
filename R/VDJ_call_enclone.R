@@ -15,8 +15,10 @@
 
 
 #' @examples
-#' \dontrun{
+#' \donttest{
+#' try({
 #' VDJ_call_enclone(vdj, VDJ.directory, samples.to.combine = c('s1', 's2', 's3'), global.clonotype = T)
+#' })
 #'}
 
 VDJ_call_enclone <- function(VDJ,
@@ -31,12 +33,12 @@ VDJ_call_enclone <- function(VDJ,
 
   if(missing(VDJ)) stop('Please input your VDJ matrix (vgm[[1]]) dat you wish to reclonotype using 10x enclone')
   if(missing(VDJ.directory)) stop('Please input your VDJ directory')
-  if(missing(global.clonotype)) global.clonotype <- F
+  if(missing(global.clonotype)) global.clonotype <- FALSE
   if(missing(samples.to.clonotype)) samples.to.clonotype <- 'all'
-  if(missing(samples.to.combine) & global.clonotype == T) samples.to.combine <- NULL
-  if(missing(same.origin)) same.origin <- F
+  if(missing(samples.to.combine) & global.clonotype == TRUE) samples.to.combine <- NULL
+  if(missing(same.origin)) same.origin <- FALSE
   if(missing(output.format)) output.format <- 'vgm'
-  if(missing(parallel)) parallel <- F
+  if(missing(parallel)) parallel <- FALSE
   if(missing(operating.system)){
         switch(Sys.info()[['sysname']],
                Windows= {message("Windows system detected")
@@ -104,11 +106,12 @@ VDJ_call_enclone <- function(VDJ,
     new_clonotypes <- new_clonotypes[c('group_id', 'barcode')]
     names(new_clonotypes)[names(new_clonotypes) == 'group_id'] <- 'new_group_id'
     names(new_clonotypes)[names(new_clonotypes) == 'barcode'] <- 'stripped_barcodes'
+    new_clonotypes$stripped_barcodes <- lapply(new_clonotypes$stripped_barcodes, function(x) unlist(stringr::str_split(x, '-'))[1])
 
     sample_df <- enclone_out$sample_df
     sample_df <- strip_barcodes(sample_df)
 
-    sample_out <- merge(sample_df, new_clonotypes, by='stripped_barcodes', all.x = T)
+    sample_out <- merge(sample_df, new_clonotypes, by='stripped_barcodes', all.x = TRUE)
     sample_out$new_group_id <- unlist(lapply(sample_out$new_group_id, function(x) paste0('clonotype', x)))
     sample_out$clonotype_id <- sample_out$new_group_id
     sample_out$clonotype_id_10x <- sample_out$new_group_id
@@ -165,11 +168,11 @@ VDJ_call_enclone <- function(VDJ,
 
   sample_files <- list.files(VDJ.directory)
   sample_files <- unlist(lapply(sample_files, function(x) tolower(x)))
-  for(sample in samples_to_clonotype){
-    if(!(tolower(sample) %in% sample_files)){
-      stop(paste0('Unable to find the VDJ out file for sample ', sample))
-    }
-  }
+  #for(sample in samples_to_clonotype){
+  #  if(!(tolower(sample) %in% sample_files)){
+  #    stop(paste0('Unable to find the VDJ out file for sample ', sample))
+  #  }
+  #}
 
   samples_not_clonotyped <- VDJ[!(VDJ$sample_id %in% samples_to_clonotype),]
   VDJ <- VDJ[VDJ$sample_id %in% samples_to_clonotype,]
@@ -233,7 +236,7 @@ VDJ_call_enclone <- function(VDJ,
     sample_outs <- lapply(enclone_outs, function(x) merge_enclone_clonotypes(x))
   }
 
-  #unlink(temp_dir, recursive = T)
+  unlink(temp_dir, recursive = TRUE)
 
   if(output.format == 'vgm'){
     vdj <- do.call('rbind', sample_outs)

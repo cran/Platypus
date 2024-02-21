@@ -13,11 +13,11 @@
 #' @export
 #' @examples
 #'
-#' \dontrun{
-#' #Rarefaction analysis of CDRH3 across samples
+#' \donttest{
+#' try({
 #' plot <- VDJ_diversity(VDJ = Platypus::small_vgm[[1]],
 #' ,feature.columns = c("VDJ_cdr3s_aa"), grouping.column = "sample_id")
-#'
+#'})
 #'}
 
 
@@ -37,7 +37,7 @@ VDJ_rarefaction <- function(VDJ,
   if(missing(VDJ)) stop('Please input your data as a VDJ matrix')
   if(missing(feature.columns)) feature.columns <- c('VDJ_cdr3s_aa')
   if(missing(grouping.column)) grouping.column <- 'sample_id' # or =='none'
-  if(missing(VDJ.VJ.1chain)) VDJ.VJ.1chain <- F
+  if(missing(VDJ.VJ.1chain)) VDJ.VJ.1chain <- FALSE
   if(missing(rarefaction.type)) rarefaction.type <- 'sample.size' #vs coverage.based and sample.completeness
   if(missing(hill.numbers)) hill.numbers <- c(0,1,2)
   if(missing(number.resamples)) number.resamples <- 50
@@ -52,9 +52,9 @@ VDJ_rarefaction <- function(VDJ,
   get_abundances <- function(VDJ, feature.columns, grouping.column, VDJ.VJ.1chain){
 
     if(length(feature.columns) > 1){
-      combine.features <- T
+      combine.features <- TRUE
     }else{
-      combine.features <- F
+      combine.features <- FALSE
     }
 
     abundance_df <- VDJ_abundances(VDJ,

@@ -11,11 +11,13 @@
 #' @return Returns a ggplot with the kmer analysis depedning on the plot.format parameter
 #' @export
 #' @examples
-#' \dontrun{
-#' #Calculate the 3-kmer frequency for CDRH3s and plot the 20 most abundant kmers.
+#' \donttest{
+#' try({
 #'  VDJ_kmers(VDJ = Platypus::small_vgm[[1]],
-#' ,sequence.columns = c("VDJ_cdr3s_aa"), grouping.column = "sample_id", kmer.k = 3, max.kmers = 20)
-#'}
+#'  sequence.column = c("VDJ_cdr3s_aa"), grouping.column = "sample_id", kmer.k = 2, max.kmers = 5)
+#'  })
+#' }
+#'
 
 VDJ_kmers <- function(VDJ,
                       sequence.column,
@@ -35,11 +37,11 @@ VDJ_kmers <- function(VDJ,
   if(missing(max.kmers)) max.kmers <- 30
   if(missing(specific.kmers)) specific.kmers <- NULL
   if(missing(plot.format)) plot.format <- 'barplot' #or spectrum or pca
-  if(missing(as.proportions)) as.proportions <- F
+  if(missing(as.proportions)) as.proportions <- FALSE
 
-  get_feature_combinations <- function(x, y, split.x, split.y, split.by=';', collapse.by=';', combine.sequences=F){
-   if(split.x==T) x <- stringr::str_split(x, split.by ,simplify=T)[1,]
-   if(split.y==T) y <- stringr::str_split(y, split.by ,simplify=T)[1,]
+  get_feature_combinations <- function(x, y, split.x, split.y, split.by=';', collapse.by=';', combine.sequences=FALSE){
+   if(split.x==TRUE) x <- stringr::str_split(x, split.by ,simplify=TRUE)[1,]
+   if(split.y==TRUE) y <- stringr::str_split(y, split.by ,simplify=TRUE)[1,]
 
    ccombs <- expand.grid(x,y)
    if(!combine.sequences){
@@ -54,14 +56,14 @@ VDJ_kmers <- function(VDJ,
   }
 
   if(length(sequence.column) == 2){
-    VDJ[[paste0(sequence.column, collapse = ';')]] <- mapply(function(x,y) get_feature_combinations(x, y, split.x=T, split.y=T, combine.sequences=T), VDJ[sequence.column[1]], VDJ[sequence.column[2]])
+    VDJ[[paste0(sequence.column, collapse = ';')]] <- mapply(function(x,y) get_feature_combinations(x, y, split.x=TRUE, split.y=TRUE, combine.sequences=TRUE), VDJ[sequence.column[1]], VDJ[sequence.column[2]])
     sequence.column <- paste0(sequence.column, collapse = ';')
   }
 
   if(stringr::str_detect(sequence.column, '_aa')){
-    aa <- T
+    aa <- TRUE
   }else if(stringr::str_detect(sequence.column, '_nt')){
-    aa <- F
+    aa <- FALSE
   }
 
   if(length(grouping.column) > 1){
@@ -116,7 +118,7 @@ VDJ_kmers <- function(VDJ,
         temp_df <- kmer_df %>%
                    dplyr::group_by(kmers) %>%
                    dplyr::mutate(total_counts = sum(counts)) %>%
-                   dplyr::distinct(kmers, .keep_all = T) %>%
+                   dplyr::distinct(kmers, .keep_all = TRUE) %>%
                    dplyr::arrange(dplyr::desc(total_counts))
 
         specific.kmers <- temp_df[1:max.kmers,]$kmers
