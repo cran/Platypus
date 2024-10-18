@@ -3,6 +3,7 @@
 #' @param VDJ VDJ dataframe output from the VDJ_GEX_matrix function.
 #' @param sequence.column Character vector. One or more sequence column names from the VDJ for kmer counting. if more than one column is provided (e.g. c("VDJ_cdr3s_aa","VJ_cdr3s_aa")) these columns will be pasted together before counting the kmers.
 #' @param grouping.column Character. Column name of a column to group kmer counting by. This could be "sample_id" to group each kmer by the sample.
+#' @param pool.per.group Boolean. If TRUE, will sum the kmer counts of each sequence per grouping factor (determined in grouping.column).
 #' @param kmer.k Integer. Length k of each kmer.
 #' @param max.kmers Integer. Maximum number of kmers to be plotted in the output barplots.
 #' @param specific.kmers Character vector. Specific kmers to be plotted in the output barplots.
@@ -22,6 +23,7 @@
 VDJ_kmers <- function(VDJ,
                       sequence.column,
                       grouping.column,
+                      pool.per.group,
                       kmer.k,
                       max.kmers,
                       specific.kmers,
@@ -33,6 +35,7 @@ VDJ_kmers <- function(VDJ,
   if(missing(VDJ)) stop('Please input your VDJ matrix for the kmer analysis')
   if(missing(sequence.column)) sequence.column <- 'VDJ_cdr3s_aa'
   if(missing(grouping.column)) grouping.column <- 'sample_id'
+  if(missing(pool.per.group)) pool.per.group <- FALSE
   if(missing(kmer.k)) kmer.k <- 5
   if(missing(max.kmers)) max.kmers <- 30
   if(missing(specific.kmers)) specific.kmers <- NULL
@@ -84,19 +87,28 @@ VDJ_kmers <- function(VDJ,
 
     for(i in 1:length(unique_groups)){
       sequences <- unname(unlist(VDJ[sequence.column][which(VDJ[[grouping.column]] == unique_groups[i]),]))
-      if(any(stringr::str_detect(sequences, ';'))) {
-        sequences <- sapply(sequences, function(x) unlist(stringr::str_split(x, ';')))
-      }
+      #if(any(stringr::str_detect(sequences, ';'))) {
+      #  sequences <- sapply(sequences, function(x) unlist(stringr::str_split(x, ';')))
+      #}
+      if(pool.per.group){
+        if(!aa){
+          out_dfs[[i]] <- as.data.frame(colSums(kmer::kcount(ape::as.DNAbin(Biostrings::DNAStringSet(sequences)), k = kmer.k)))
+        }else{
+          out_dfs[[i]] <- as.data.frame(colSums(kmer::kcount(ape::as.AAbin(Biostrings::AAStringSet(sequences)), k = kmer.k)))
+        }
 
-      if(!aa){
-        out_dfs[[i]] <- as.data.frame(colSums(kmer::kcount(ape::as.DNAbin(Biostrings::DNAStringSet(sequences)), k = kmer.k)))
+        colnames(out_dfs[[i]]) <- 'counts'
+        out_dfs[[i]]$kmers <- rownames(out_dfs[[i]])
+        out_dfs[[i]]$group <- unlist(unique_groups[i])
+        
       }else{
-        out_dfs[[i]] <- as.data.frame(colSums(kmer::kcount(ape::as.AAbin(Biostrings::AAStringSet(sequences)), k = kmer.k)))
+        if(!aa){
+          out_dfs[[i]] <- as.data.frame(kmer::kcount(ape::as.DNAbin(Biostrings::DNAStringSet(sequences)), k = kmer.k))
+        }else{
+          out_dfs[[i]] <- as.data.frame(kmer::kcount(ape::as.AAbin(Biostrings::AAStringSet(sequences)), k = kmer.k))
+        }
       }
 
-      colnames(out_dfs[[i]]) <- 'counts'
-      out_dfs[[i]]$kmers <- rownames(out_dfs[[i]])
-      out_dfs[[i]]$group <- unlist(unique_groups[i])
     }
 
     out_dfs <- do.call('rbind', out_dfs)
@@ -170,7 +182,8 @@ VDJ_kmers <- function(VDJ,
       plot <- ggplot2::ggplot(data = pca_out) +
                   ggplot2::geom_vline(xintercept = c(0), color = "grey70", linetype = 2, size = 0.75) +
                   ggplot2::geom_hline(yintercept = c(0), color = "grey70", linetype = 2, size = 0.75) +
-                  ggplot2::geom_point(ggplot2::aes(x = PC1, y = PC2, color = group), size = 6, alpha = 0.8) +
+                  ggplot2::geom_point(ggplot2::aes(x = PC1, y = PC2, fill = group), size = 6, alpha = 1, shape = 21, colour = 'black') +
+                  #ggplot2::geom_point(ggplot2::aes(x = PC1, y = PC2), shape = 1, size = 6, alpha = 1, colour = 'black') +
                   ggplot2::theme(panel.grid.major = ggplot2::element_blank(), panel.grid.minor = ggplot2::element_blank(),
                            panel.background = ggplot2::element_blank(), axis.line = ggplot2::element_line(colour = "black")) +
                   ggplot2::labs(title = paste0('PCA reduction of ', sequence.column, ' ', kmer.k, '-kmers'), color = paste0(grouping.column))

@@ -21,7 +21,7 @@ VDJ_clonotype_v3_w_enclone(
 )
 }
 \arguments{
-\item{VDJ}{For platypus v2 output from VDJ_analyze function. This should be a list of clonotype dataframes, with each list element corresponding to a single VDJ repertoire. For platypus v3 VDJ output from the VDJ_GEX_matrix function (VDJ_GEX_matrix.output[[1]])}
+\item{VDJ}{For platypus v2 output from VDJ_analyze function. This should be a list of clonotype dataframes, with each list element corresponding to a single VDJ repertoire. For platypus v3 VDJ output from the VDJ_build function}
 
 \item{VDJ.directory}{Cellranger output directory for VDJ files.}
 
@@ -66,9 +66,5 @@ We thank Prof. Vijayanand as well as Vicente and Emmanuel from his lab for the d
 reclonotyped_vgm <- VDJ_clonotype(VDJ=Platypus::small_vgm[[1]],
 clone.strategy="cdr3.nt",
 hierarchical = "none", global.clonotype = TRUE)
-
-reclonotyped_vgm <- VDJ_clonotype(VDJ=Platypus::small_vgm[[1]],
-clone.strategy="cdr3.homology", homology.threshold = 0.5,
-hierarchical = "single.chains", global.clonotype = TRUE)
 
 }
